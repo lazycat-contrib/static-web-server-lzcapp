@@ -1,0 +1,43 @@
+application:
+  subdomain: static-web-server
+  multi_instance: false
+  # Static Web Server has no user accounts or login at all (it just serves
+  # files), so it must NOT be exposed via public_path; the platform login
+  # gate stays the only line of defense.
+  upstreams:
+    - location: /package-licenses/
+      backend: file:///lzcapp/pkg/content/licenses/
+    - location: /
+      backend: http://static-web-server:80/
+services:
+  static-web-server:
+    # upstream: joseluisq/static-web-server:2.44.1
+    image: docker.1ms.run/joseluisq/static-web-server:2.44.1
+    environment:
+      # upstream default is ./public relative to the workdir; we pin it to
+      # the mounted volume path explicitly so the served root never depends
+      # on the container working directory.
+      - SERVER_ROOT=/public
+      - TZ=Asia/Shanghai
+    binds:
+      - /lzcapp/var/data:/public
+usage: |
+  Static Web Server 是一个用 Rust 编写的高速静态文件服务器：单二进制、
+  零运行时依赖，支持 HTTP/2、gzip/zstd/brotli 自动压缩、缓存控制、
+  目录列表、CORS、SPA 单页应用回退等特性。
+
+  使用方法：
+  1. 把要托管的网站/静态文件放进应用的 /public 目录（本包对应
+     /lzcapp/var/data），打开应用即可通过 HTTP 访问。
+  2. 放一个 index.html 即可作为站点首页；没有 index 时默认展示目录列表。
+  3. 高级配置（缓存策略、CORS、重定向等）可通过 SERVER_CONFIG_FILE
+     配合 TOML 文件使用，详见官方文档：https://static-web-server.net
+
+  数据与安全：
+  - 本应用自身没有任何账号与登录机制（纯静态文件服务），
+    因此本包不对外开放未登录访问（保持平台入口鉴权）。
+    放入 /public 的内容对所有能通过平台鉴权打开该应用的用户可见。
+  - 文件保存在 /lzcapp/var/data，卸载应用会一并删除，请定期备份。
+
+  说明：
+  - 本包未做实机验证，功能以官方文档为准，遇到问题请反馈。

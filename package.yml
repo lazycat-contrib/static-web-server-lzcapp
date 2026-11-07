@@ -1,0 +1,18 @@
+package: community.lazycat.app.static-web-server
+name: static-web-server
+version: 2.44.1
+description: "Blazing fast static file server with zero runtime dependencies, built in Rust."
+min_os_version: "1.5.0"
+homepage: https://static-web-server.net
+author: joseluisq
+license: Apache-2.0 AND MIT
+permissions:
+  required:
+    - net.internet
+locales:
+  zh:
+    name: Static Web Server 静态文件服务器
+    description: "Rust 编写的高速静态文件服务器：零运行时依赖、单二进制、支持 HTTP/2、压缩、缓存控制与 SPA 回退。"
+  en:
+    name: Static Web Server
+    description: "Blazing fast static file server with zero runtime dependencies, built in Rust."
